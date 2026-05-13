@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Advanced AAC Board</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f0f4f8; }
+        #sentence-bar { width: 100%; min-height: 50px; background: white; border: 2px solid #ccc; margin-bottom: 20px; padding: 10px; display: flex; gap: 10px; align-items: center; font-size: 20px; border-radius: 8px; box-sizing: border-box; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .aac-btn { background: #fff; border: 3px solid #3498db; border-radius: 12px; padding: 25px 10px; font-size: 18px; font-weight: bold; cursor: pointer; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .folder-btn { border-color: #f1c40f; background: #fef9e7; }
+        .action-btn { background: #2ecc71; color: white; border-color: #27ae60; }
+        .clear-btn { background: #e74c3c; color: white; border-color: #c0392b; }
+        .admin-panel { background: #e2e8f0; padding: 15px; border-radius: 8px; margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+    <div id="sentence-bar">👉 </div>
+
+    <div class="grid" id="board-grid"></div>
+
+    <div class="grid">
+        <button class="aac-btn action-btn" onclick="speakSentence()">🗣️ Speak Sentence</button>
+        <button class="aac-btn clear-btn" onclick="clearSentence()">❌ Clear</button>
+    </div>
+
+    <div class="admin-panel">
+        <h3>🔧 Quick Customizer (Adds to Current Folder)</h3>
+        <input type="text" id="new-label" placeholder="Button Label (e.g., Banana)">
+        <input type="text" id="new-speech" placeholder="Speech Text (e.g., I want a banana)">
+        <button onclick="addNewWordButton()">Add Custom Word Button</button>
+        <button onclick="resetBoard()" style="background:#95a5a6; color:white; border:none; padding:5px 10px; cursor:pointer;">Reset to Default</button>
+    </div>
+
+    <script>
+        // Default board layout fallback
+        const defaultBoardData = {
+            "root": [
+                { "label": "I want", "type": "word", "speakText": "I want" },
+                { "label": "Feelings 📂", "type": "folder", "targetFolder": "feelings" },
+                { "label": "Food 📂", "type": "folder", "targetFolder": "food" },
+                { "label": "Help", "type": "word", "speakText": "Help me" }
+            ],
+            "feelings": [
+                { "label": "Happy 😊", "type": "word", "speakText": "I feel happy" },
+                { "label": "Sad 😢", "type": "word", "speakText": "I feel sad" },
+                { "label": "↩ Back", "type": "folder", "targetFolder": "root" }
+            ],
+            "food": [
+                { "label": "Apple 🍎", "type": "word", "speakText": "Apple" },
+                { "label": "Water 💧", "type": "word", "speakText": "Water" },
+                { "label": "↩ Back", "type": "folder", "targetFolder": "root" }
+            ]
+        };
+
+        // Initialize state
+        let boardData = JSON.parse(localStorage.getItem('aac_board_data')) || defaultBoardData;
+        let currentFolder = "root";
+        let currentSentence = [];
+
+        const gridContainer = document.getElementById('board-grid');
+        const sentenceBar = document.getElementById('sentence-bar');
+
+        // Render the buttons for the active folder
+        function renderBoard() {
+            gridContainer.innerHTML = '';
+            const activeCards = boardData[currentFolder] || [];
+
+            activeCards.forEach(card => {
+                const button = document.createElement('button');
+                button.innerText = card.label;
+                
+                if (card.type === 'folder') {
+                    button.className = 'aac-btn folder-btn';
+                    button.onclick = () => changeFolder(card.targetFolder);
+                } else {
+                    button.className = 'aac-btn';
+                    button.onclick = () => selectWord(card.speakText);
+                }
+                
+                gridContainer.appendChild(button);
+            });
+        }
+
+        function changeFolder(folderName) {
+            currentFolder = folderName;
+            renderBoard();
+        }
+
+        function selectWord(speechText) {
+            currentSentence.push(speechText);
+            sentenceBar.innerText = "👉 " + currentSentence.join(' ');
+            speak(speechText); // Quick feedback audio
+        }
+
+        function speakSentence() {
+            if (currentSentence.length === 0) return;
+            speak(currentSentence.join(' '));
+        }
+
+        function clearSentence() {
+            currentSentence = [];
+            sentenceBar.innerText = "👉 ";
+        }
+
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // --- LOCAL STORAGE & EDITS FEATURE ---
+        function addNewWordButton() {
+            const label = document.getElementById('new-label').value;
+            const speech = document.getElementById('new-speech').value;
+            
+            if (!label || !speech) return alert("Please fill out both fields!");
+
+            // Add the new card data to the active folder array
+            boardData[currentFolder].push({
+                "label": label,
+                "type": "word",
+                "speakText": speech
+            });
+
+            // Save the updated object back to LocalStorage
+            localStorage.setItem('aac_board_data', JSON.stringify(boardData));
+            
+            // Clear inputs and refresh screen
+            document.getElementById('new-label').value = '';
+            document.getElementById('new-speech').value = '';
+            renderBoard();
+        }
+
+        function resetBoard() {
+            if(confirm("Reset board to default defaults?")) {
+                localStorage.removeItem('aac_board_data');
+                boardData = defaultBoardData;
+                currentFolder = "root";
+                renderBoard();
+            }
+        }
+
+        // Start app
+        renderBoard();
+    </script>
+</body>
+</html>
