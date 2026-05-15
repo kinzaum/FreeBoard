@@ -2,64 +2,337 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Web AAC Board</title>
+    <title>Bilingual AAC Board</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background: #f0f4f8; }
-        #sentence-bar { width: 100%; min-height: 50px; background: white; border: 2px solid #ccc; margin-bottom: 20px; padding: 10px; display: flex; gap: 10px; align-items: center; font-size: 20px; border-radius: 8px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; }
-        .aac-btn { background: #fff; border: 3px solid #3498db; border-radius: 12px; padding: 20px; font-size: 18px; font-weight: bold; cursor: pointer; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.1s; }
-        .aac-btn:active { transform: scale(0.95); }
-        .action-btn { background: #2ecc71; color: white; border-color: #27ae60; }
-        .clear-btn { background: #e74c3c; color: white; border-color: #c0392b; }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f4f8;
+        }
+
+        /* Top Navigation Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 20px;
+        }
+
+        #lang-select {
+            padding: 8px 12px;
+            font-size: 16px;
+            border-radius: 6px;
+            border: 2px solid #3498db;
+            cursor: pointer;
+        }
+
+        /* Sentence Bar Layout */
+        #sentence-bar {
+            width: 100%;
+            min-height: 60px;
+            background: white;
+            border: 2px solid #ccc;
+            margin-bottom: 20px;
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            font-size: 22px;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        /* Communication Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* AAC Buttons */
+        .aac-btn {
+            background: #fff;
+            border: 3px solid #3498db;
+            border-radius: 12px;
+            padding: 20px 10px;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100px;
+            transition: transform 0.1s;
+        }
+
+            .aac-btn:active {
+                transform: scale(0.96);
+            }
+
+        .folder-btn {
+            border-color: #f1c40f;
+            background: #fef9e7;
+        }
+
+        /* Text Sizing inside AAC Buttons */
+        .main-label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .sub-label {
+            font-size: 13px;
+            color: #7f8c8d;
+            font-weight: normal;
+            margin-top: 8px;
+            border-top: 1px dashed #bdc3c7;
+            padding-top: 5px;
+            width: 100%;
+        }
+
+        /* Control Action Buttons */
+        .action-btn {
+            background: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .clear-btn {
+            background: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Customizer / Admin Panel */
+        .admin-panel {
+            background: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+
+            .admin-panel input {
+                padding: 8px;
+                font-size: 14px;
+                margin-right: 10px;
+                margin-bottom: 10px;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+                width: 200px;
+            }
+
+            .admin-panel button {
+                padding: 8px 15px;
+                font-size: 14px;
+                cursor: pointer;
+                border-radius: 4px;
+                border: none;
+                background: #34495e;
+                color: white;
+            }
     </style>
 </head>
 <body>
 
+    <div class="top-bar">
+        <div>
+            <label for="lang-select" style="font-weight: bold; font-size: 16px;">Language / Idioma: </label>
+            <select id="lang-select" onchange="toggleLanguage(this.value)">
+                <option value="en">English Only</option>
+                <option value="pt">Português (English sub-labels)</option>
+            </select>
+        </div>
+    </div>
+
     <div id="sentence-bar">👉 </div>
 
+    <div class="grid" id="board-grid"></div>
+
     <div class="grid">
-        <button class="aac-btn" onclick="addWord('I want')">I want</button>
-        <button class="aac-btn" onclick="addWord('Help')">Help</button>
-        <button class="aac-btn" onclick="addWord('More')">More</button>
-        <button class="aac-btn" onclick="addWord('Stop')">Stop</button>
-        <button class="aac-btn" onclick="addWord('Eat')">Eat</button>
-        <button class="aac-btn" onclick="addWord('Drink')">Drink</button>
-        
-        <button class="aac-btn action-btn" onclick="speakSentence()">🗣️ Speak</button>
-        <button class="aac-btn clear-btn" onclick="clearSentence()">❌ Clear</button>
+        <button class="aac-btn action-btn" onclick="speakSentence()">🗣️ Speak / Falar</button>
+        <button class="aac-btn clear-btn" onclick="clearSentence()">❌ Clear / Limpar</button>
+    </div>
+
+    <div class="admin-panel">
+        <h3>🔧 Custom Button Creator (Adds to current active view)</h3>
+        <input type="text" id="new-label-en" placeholder="English Label (e.g., Cat)">
+        <input type="text" id="new-label-pt" placeholder="Portuguese Label (e.g., Gato)">
+        <br>
+        <input type="text" id="new-speak-en" placeholder="Speech English (e.g., Look at the cat)">
+        <input type="text" id="new-speak-pt" placeholder="Speech Portuguese (e.g., Olhe para o gato)">
+        <br>
+        <button onclick="addNewWordButton()">Add Custom Word Card</button>
+        <button onclick="resetBoard()" style="background:#95a5a6; margin-left: 10px;">Reset Entire Board</button>
     </div>
 
     <script>
-        let currentSentence = [];
+// REPLACE your old defaultBoardData with this updated flow structure:
+const defaultBoardData = {
+    "root": [
+        { "type": "folder", "targetFolder": "want_actions", "label_en": "I want...", "label_pt": "Eu quero..." },
+        { "type": "folder", "targetFolder": "feelings", "label_en": "I am...", "label_pt": "Eu estou..." }
+    ],
+    "want_actions": [
+        { "type": "folder", "targetFolder": "toys", "label_en": "To Play 🧩", "label_pt": "Jogar / Brincar 🧩" },
+        { "type": "folder", "targetFolder": "snacks", "label_en": "To Eat 🍎", "label_pt": "Comer 🍎" },
+        { "type": "folder", "targetFolder": "drinks", "label_en": "To Drink 💧", "label_pt": "Beber 💧" },
+        { "type": "word", "label_en": "To Stop 🛑", "label_pt": "Parar 🛑", "speak_en": "I want to stop", "speak_pt": "Eu quero parar" },
+        { "type": "word", "label_en": "To Read 📚", "label_pt": "Ler 📚", "speak_en": "I want to read", "speak_pt": "Eu quero ler" },
+        { "type": "folder", "targetFolder": "root", "label_en": "↩ Back", "label_pt": "↩ Voltar" }
+    ],
+    "toys": [
+        { "type": "word", "label_en": "Ball ⚽", "label_pt": "Bola ⚽", "speak_en": "I want to play with the ball", "speak_pt": "Eu quero brincar com a bola" },
+        { "type": "word", "label_en": "Blocks 🧱", "label_pt": "Blocos 🧱", "speak_en": "I want to play with blocks", "speak_pt": "Eu quero brincar com blocos" },
+        { "type": "word", "label_en": "Kinetic Sand ⏳", "label_pt": "Areia Cinética ⏳", "speak_en": "I want to play with kinetic sand", "speak_pt": "Eu quero brincar com areia cinética" },
+        { "type": "word", "label_en": "Playdough 🧪", "label_pt": "Massinha 🧪", "speak_en": "I want to play with playdough", "speak_pt": "Eu quero brincar com massinha" },
+        { "type": "word", "label_en": "Cellphone 📱", "label_pt": "Celular 📱", "speak_en": "I want the cellphone", "speak_pt": "Eu quero o celular" },
+        { "type": "word", "label_en": "Tablet 📟", "label_pt": "Tablet 📟", "speak_en": "I want the tablet", "speak_pt": "Eu quero o tablet" },
+        { "type": "folder", "targetFolder": "want_actions", "label_en": "↩ Back", "label_pt": "↩ Voltar" }
+    ],
+    "drinks": [
+        { "type": "word", "label_en": "Water 💧", "label_pt": "Água 💧", "speak_en": "I want to drink water", "speak_pt": "Eu quero beber água" },
+        { "type": "word", "label_en": "Juice 🧃", "label_pt": "Suco 🧃", "speak_en": "I want to drink juice", "speak_pt": "Eu quero beber suco" },
+        { "type": "folder", "targetFolder": "want_actions", "label_en": "↩ Back", "label_pt": "↩ Voltar" }
+    ],
+    "snacks": [
+        { "type": "word", "label_en": "Apple 🍎", "label_pt": "Maçã 🍎", "speak_en": "I want to eat an apple", "speak_pt": "Eu quero comer uma maçã" },
+        { "type": "word", "label_en": "Banana 🍌", "label_pt": "Banana 🍌", "speak_en": "I want to eat a banana", "speak_pt": "Eu quero comer uma banana" },
+        { "type": "folder", "targetFolder": "want_actions", "label_en": "↩ Back", "label_pt": "↩ Voltar" }
+    ],
+    "feelings": [
+        { "type": "word", "label_en": "Happy 😊", "label_pt": "Feliz 😊", "speak_en": "I feel happy", "speak_pt": "Eu estou feliz" },
+        { "type": "word", "label_en": "Sad 😢", "label_pt": "Triste 😢", "speak_en": "I feel sad", "speak_pt": "Eu estou triste" },
+        { "type": "folder", "targetFolder": "root", "label_en": "↩ Back", "label_pt": "↩ Voltar" }
+    ]
+};
+
+        // Initialize App State
+        let boardData = JSON.parse(localStorage.getItem('aac_bilingual_data')) || defaultBoardData;
+        let currentFolder = "root";
+        let currentLang = "en";
+        let currentSentenceText = [];
+
+        const gridContainer = document.getElementById('board-grid');
         const sentenceBar = document.getElementById('sentence-bar');
 
-        function addWord(word) {
-            currentSentence.push(word);
-            sentenceBar.innerText = "👉 " + currentSentence.join(' ');
-            
-            // Optional: Speak the individual word immediately on press
-            speak(word); 
+        // Main dynamic rendering function
+        function renderBoard() {
+            gridContainer.innerHTML = '';
+            const activeCards = boardData[currentFolder] || [];
+
+            activeCards.forEach(card => {
+                const button = document.createElement('button');
+
+                // Build the bilingual text layouts dynamically based on runtime choice
+                if (currentLang === 'pt') {
+                    button.innerHTML = `
+                            <div class="main-label">${card.label_pt}</div>
+                            <div class="sub-label">${card.label_en}</div>
+                        `;
+                } else {
+                    button.innerHTML = `<div class="main-label">${card.label_en}</div>`;
+                }
+
+                // Apply styling class and routing rules based on card specifications
+                if (card.type === 'folder') {
+                    button.className = 'aac-btn folder-btn';
+                    button.onclick = () => changeFolder(card.targetFolder);
+                } else {
+                    button.className = 'aac-btn';
+                    button.onclick = () => selectWord(card);
+                }
+
+                gridContainer.appendChild(button);
+            });
+        }
+
+        function changeFolder(folderName) {
+            currentFolder = folderName;
+            renderBoard();
+        }
+
+        function toggleLanguage(lang) {
+            currentLang = lang;
+            renderBoard();
+        }
+
+        function selectWord(card) {
+            // Pick up the vocal context and the text array representation aligned to current language
+            const phrase = currentLang === 'pt' ? card.speak_pt : card.speak_en;
+            const printedLabel = currentLang === 'pt' ? card.label_pt : card.label_en;
+
+            currentSentenceText.push(phrase);
+            sentenceBar.innerText = "👉 " + currentSentenceText.join(' ');
+
+            speak(phrase);
         }
 
         function speakSentence() {
-            if (currentSentence.length === 0) return;
-            speak(currentSentence.join(' '));
+            if (currentSentenceText.length === 0) return;
+            speak(currentSentenceText.join(' '));
         }
 
         function clearSentence() {
-            currentSentence = [];
+            currentSentenceText = [];
             sentenceBar.innerText = "👉 ";
         }
 
         function speak(text) {
-            // Using the browser's built-in Speech Synthesis
             const utterance = new SpeechSynthesisUtterance(text);
-            
-            // Optional: Customize voice properties
-            // utterance.rate = 0.9; // Slightly slower for clarity
-            
+            // Adjust speech engine locale to bypass English accents on Portuguese phonetics
+            utterance.lang = currentLang === 'pt' ? 'pt-BR' : 'en-US';
             window.speechSynthesis.speak(utterance);
         }
+
+        // --- MANAGE SYSTEM PRESETS & STORAGE CHANGES ---
+        function addNewWordButton() {
+            const labelEn = document.getElementById('new-label-en').value;
+            const labelPt = document.getElementById('new-label-pt').value;
+            const speakEn = document.getElementById('new-speak-en').value;
+            const speakPt = document.getElementById('new-speak-pt').value;
+
+            if (!labelEn || !labelPt || !speakEn || !speakPt) {
+                return alert("Please fulfill all data variables to ensure complete translation paths!");
+            }
+
+            boardData[currentFolder].push({
+                "type": "word",
+                "label_en": labelEn,
+                "label_pt": labelPt,
+                "speak_en": speakEn,
+                "speak_pt": speakPt
+            });
+
+            localStorage.setItem('aac_bilingual_data', JSON.stringify(boardData));
+
+            // Clear layout input entries
+            document.getElementById('new-label-en').value = '';
+            document.getElementById('new-label-pt').value = '';
+            document.getElementById('new-speak-en').value = '';
+            document.getElementById('new-speak-pt').value = '';
+
+            renderBoard();
+        }
+
+        function resetBoard() {
+            if (confirm("Are you sure you want to completely restore the factory layouts? All modifications will disappear.")) {
+                localStorage.removeItem('aac_bilingual_data');
+                boardData = defaultBoardData;
+                currentFolder = "root";
+                renderBoard();
+            }
+        }
+
+        // Initial Layout Call
+        renderBoard();
     </script>
 </body>
 </html>
